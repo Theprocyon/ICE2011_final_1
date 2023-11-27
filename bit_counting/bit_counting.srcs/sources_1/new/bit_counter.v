@@ -30,7 +30,7 @@ module bitcount(Clock, Resetn, LA, s, Data, B, Done);
     reg [1:0] Y,y;              // Next status, current status
     reg EA, EB, LB;
     
-    // control circuit
+    // control circuit 
     
     parameter S1 = 2'b00, S2 = 2'b01, S3 = 2'b10;
     
@@ -60,12 +60,12 @@ module bitcount(Clock, Resetn, LA, s, Data, B, Done);
             y <= Y;
     end
     
-    always@(y, A[0]) //A[0]ÏùÄ s.r.Ïùò serial Ï∂úÎ†•
+    always@(y, A[0]) //A[0]?? s.r.?ùò serial Ï∂úÎ†•
     begin: FSM_outputs
         // defaults
         EA = 0; LB = 0; EB = 0; Done = 0;
         case(y)
-            S1: LB = 1;  // S1ÏóêÏÑú Counter Initializing Ìï®. 0ÏùÑ Load.
+            S1: LB = 1;  // S1?óê?Ñú Counter Initializing ?ï®. 0?ùÑ Load.
             S2: begin       // TODO
                     EA = 1;                         // Enable ea  
                     if(A[0] == 1) EB = 1;           // counting
@@ -82,12 +82,12 @@ module bitcount(Clock, Resetn, LA, s, Data, B, Done);
         if(!Resetn)
             B <= 0;
         else if(LB)
-            B <= 0;     // Counter Ïùò initial valueÎäî 0ÏúºÎ°ú ÏÇ¨Ïö©Ìï† Í≤ÉÏù¥ÎØÄÎ°ú, 0 Load.
+            B <= 0;     // Counter ?ùò initial value?äî 0?úºÎ°? ?Ç¨?ö©?ï† Í≤ÉÏù¥ÎØ?Î°?, 0 Load.
         else if(EB)
-            B <= B + 1; // Counter Îäî Enable ÎêòÏóàÏùÑ Îïå, 1 ClockÎãπ 1Ïî© ÎàÑÏÇ∞ÌïòÎäî ÎèôÏûë Ìï®.
+            B <= B + 1; // Counter ?äî Enable ?êò?óà?ùÑ ?ïå, 1 Clock?ãπ 1?î© ?àÑ?Ç∞?ïò?äî ?èô?ûë ?ï®.
 
 
     shiftrne ShiftA(Data, LA, EA, 1'b0, Clock, A);
-    assign z = ~|A;     // zÎäî AÏùò Î™®Îì† bitÎ•º norÌïú Í≤É, HighÏùº Ïãú Ïπ¥Ïö¥Ìä∏ ÏôÑÎ£åÌïú Í≤ÉÏúºÎ°ú ÌåêÎã®Ìï¥ State 2 -> 3Î°ú Ï†ÑÏù¥.
+    assign z = ~|A;     // z?äî A?ùò Î™®Îì† bitÎ•? nor?ïú Í≤?, High?ùº ?ãú Ïπ¥Ïö¥?ä∏ ?ôÑÎ£åÌïú Í≤ÉÏúºÎ°? ?åê?ã®?ï¥ State 2 -> 3Î°? ?†Ñ?ù¥.
                 
 endmodule
