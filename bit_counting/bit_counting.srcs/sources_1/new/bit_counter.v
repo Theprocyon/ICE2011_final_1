@@ -22,12 +22,12 @@
 
 module bitcount(Clock, Resetn, LA, s, Data, B, Done);
     input Clock, Resetn, LA, s; // s = start
-    input [7:0] Data;           //To Count
-    output reg [3:0] B;         //count result
-    output reg Done;            //done
-    wire [7:0] A;               //SR output
+    input [7:0] Data;           // To Count
+    output reg [3:0] B;         // count result
+    output reg Done;            // done
+    wire [7:0] A;               // SR output
     wire z;                     // no more 1 in S.R Signal
-    reg [1:0] Y,y;              //Next status, current status
+    reg [1:0] Y,y;              // Next status, current status
     reg EA, EB, LB;
     
     // control circuit
@@ -35,9 +35,9 @@ module bitcount(Clock, Resetn, LA, s, Data, B, Done);
     parameter S1 = 2'b00, S2 = 2'b01, S3 = 2'b10;
     
     // evaluate next status
-    // S1 = before start count
-    // S2 = Counter runnin'
-    // S3 = Output the result
+    // S1 = Idle, initialize
+    // S2 = Counter running
+    // S3 = Outputs the result
     always@(s, y, z)
     begin: State_table
         case(y)
@@ -51,7 +51,7 @@ module bitcount(Clock, Resetn, LA, s, Data, B, Done);
         endcase
     end
     
-    //Update state change. when reset, reset status
+    //Sync state change. when reset, reset status
     always@(posedge Clock, negedge Resetn)
     begin: State_flipflops
         if(Resetn == 0)
@@ -60,33 +60,34 @@ module bitcount(Clock, Resetn, LA, s, Data, B, Done);
             y <= Y;
     end
     
-    //do action
     always@(y, A[0]) //A[0]은 s.r.의 serial 출력
     begin: FSM_outputs
         // defaults
         EA = 0; LB = 0; EB = 0; Done = 0;
         case(y)
-            S1: LB = ;//TODO
-            S2: begin //TODO
+            S1: LB = 1;  // S1에서 Counter Initializing 함. 0을 Load.
+            S2: begin       // TODO
+                    EA = 1;                         // Enable ea  
+                    if(A[0] == 1) EB = 1;           // counting
+                    else EB = 0;                    // Update B when done
                 end
             S3: Done = 1;
         endcase
     end
     
-    //datapath circuit
-    //a[7]이 왼쪽, a[0]이 오른쪽
-    //Rshift 는 a[7]을 a[6]으로
+//datapath circuit
+
     //counter B
     always @(negedge Resetn, posedge Clock)
         if(!Resetn)
             B <= 0;
         else if(LB)
-            //zzzz
+            B <= 0;     // Counter 의 initial value는 0으로 사용할 것이므로, 0 Load.
         else if(EB)
-            //yyyy
+            B <= B + 1; // Counter 는 Enable 되었을 때, 1 Clock당 1씩 누산하는 동작 함.
 
 
     shiftrne ShiftA(Data, LA, EA, 1'b0, Clock, A);
-    assign z = ;
+    assign z = ~|A;     // z는 A의 모든 bit를 nor한 것, High일 시 카운트 완료한 것으로 판단해 State 2 -> 3로 전이.
                 
 endmodule
