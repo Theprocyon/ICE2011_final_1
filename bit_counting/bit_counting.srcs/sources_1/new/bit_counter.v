@@ -21,19 +21,23 @@
 
 
 module bitcount(Clock, Resetn, LA, s, Data, B, Done);
-    input Clock, Resetn, LA, s;
-    input [7:0] Data;
-    output reg [3:0] B;
-    output reg Done;
-    wire [7:0] A;
-    wire z; // is active?
-    reg [1:0] Y,y;
+    input Clock, Resetn, LA, s; // s = start
+    input [7:0] Data;           //To Count
+    output reg [3:0] B;         //count result
+    output reg Done;            //done
+    wire [7:0] A;               //SR output
+    wire z;                     // no more 1 in S.R Signal
+    reg [1:0] Y,y;              //Next status, current status
     reg EA, EB, LB;
     
     // control circuit
     
     parameter S1 = 2'b00, S2 = 2'b01, S3 = 2'b10;
     
+    // evaluate next status
+    // S1 = before start count
+    // S2 = Counter runnin'
+    // S3 = Output the result
     always@(s, y, z)
     begin: State_table
         case(y)
@@ -47,6 +51,7 @@ module bitcount(Clock, Resetn, LA, s, Data, B, Done);
         endcase
     end
     
+    //Update state change. when reset, reset status
     always@(posedge Clock, negedge Resetn)
     begin: State_flipflops
         if(Resetn == 0)
@@ -55,7 +60,8 @@ module bitcount(Clock, Resetn, LA, s, Data, B, Done);
             y <= Y;
     end
     
-    always@(y, A[0])
+    //do action
+    always@(y, A[0]) //A[0]은 s.r.의 serial 출력
     begin: FSM_outputs
         // defaults
         EA = 0; LB = 0; EB = 0; Done = 0;
@@ -68,7 +74,8 @@ module bitcount(Clock, Resetn, LA, s, Data, B, Done);
     end
     
     //datapath circuit
-    
+    //a[7]이 왼쪽, a[0]이 오른쪽
+    //Rshift 는 a[7]을 a[6]으로
     //counter B
     always @(negedge Resetn, posedge Clock)
         if(!Resetn)
@@ -77,6 +84,8 @@ module bitcount(Clock, Resetn, LA, s, Data, B, Done);
             //zzzz
         else if(EB)
             //yyyy
+
+
     shiftrne ShiftA(Data, LA, EA, 1'b0, Clock, A);
     assign z = ;
                 
