@@ -60,7 +60,10 @@ end
 
 always @(B, Done) begin //FSM Output Printer
     if(~Done) $display("B : %d\n", B);
-    else $display("Operation Done!\n");
+    else begin
+    $display("Operation Done!\n");
+    #2 s = 0;
+    end
 end
 
 endmodule

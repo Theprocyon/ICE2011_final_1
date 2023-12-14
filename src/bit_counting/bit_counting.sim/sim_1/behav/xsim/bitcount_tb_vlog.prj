@@ -1,0 +1,11 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  \
+"../../../../bit_counting.srcs/sources_1/new/bit_counter.v" \
+"../../../../bit_counting.srcs/sources_1/new/shiftrne.v" \
+"../../../../bit_counting.srcs/sim_1/new/bitcount_tb.v" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort
